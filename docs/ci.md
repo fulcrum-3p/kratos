@@ -30,14 +30,21 @@ image.
 
 Set the `AWS_ECR_ROLE_ARN` Actions variable for `fulcrum-3p/kratos` to the ARN
 of an AWS role configured for GitHub OIDC. Keep the provider audience set to
-`sts.amazonaws.com` and keep a `sub` condition in the role trust policy. For
-this repository's deployment branch, an exact subject is
-`repo:fulcrum-3p/kratos:ref:refs/heads/fulcrum_main`. To reuse a role across
-branches in this repository, a `StringLike` subject pattern can be
-`repo:fulcrum-3p/kratos:ref:refs/heads/*`. A broader pattern such as
-`repo:fulcrum-3p/*:ref:refs/heads/*` lets any branch in any repository in the
-organization assume the role; use it only if all those repositories and
-branches should have the same ECR publishing authority.
+`sts.amazonaws.com` and keep a `sub` condition in the role trust policy. To
+allow any branch in any `fulcrum-3p` repository to assume the role, use this
+`StringLike` condition:
+
+```json
+{
+  "token.actions.githubusercontent.com:sub": "repo:fulcrum-3p/*:ref:refs/heads/*"
+}
+```
+
+The `refs/heads/` portion limits the subject to branches; the trailing
+wildcard accepts branch names such as `main`, `master`, or `fulcrum_main`.
+This trust is intentionally organization-wide: any branch in any repository
+that can request a GitHub OIDC token can use the role's ECR permissions, not
+just this Kratos workflow. It does not match tag or pull-request subjects.
 
 The role must be able to publish `kratos` in `280296955917` / `us-east-2`, pull
 that image, and push it to each destination above. For the
