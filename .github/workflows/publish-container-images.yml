@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     name: Build and publish source image
-    runs-on: flcrm-gh-standard
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
       contents: read
@@ -52,7 +52,7 @@ jobs:
   copy:
     name: Copy image to ${{ matrix.destination.region }}
     needs: build
-    runs-on: flcrm-gh-standard
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
       id-token: write
