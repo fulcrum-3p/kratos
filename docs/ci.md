@@ -28,9 +28,9 @@ registration or runner IAM role is required. The runner needs outbound access
 to AWS STS and the listed ECR regions, plus `quay.io` to download the Skopeo
 image.
 
-Set the `AWS_ECR_ROLE_ARN` Actions variable for `fulcrum-3p/kratos` to the ARN
-of an AWS role configured for GitHub OIDC. Keep the provider audience set to
-`sts.amazonaws.com` and keep a `sub` condition in the role trust policy. To
+Set the `AWS_ECR_ROLE_ARN` repository Actions secret for `fulcrum-3p/kratos` to
+the ARN of an AWS role configured for GitHub OIDC. Keep the provider audience
+set to `sts.amazonaws.com` and keep a `sub` condition in the role trust policy. To
 allow any branch in any `fulcrum-3p` repository to assume the role, use this
 `StringLike` condition:
 
