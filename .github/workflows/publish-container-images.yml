@@ -76,9 +76,13 @@ jobs:
           - account: "833023401363"
             region: ap-southeast-4
     env:
+      DOCKER_CONFIG: ${{ github.workspace }}/.docker
       SOURCE_IMAGE: 280296955917.dkr.ecr.us-east-2.amazonaws.com/kratos:${{ github.sha }}
       DESTINATION_REGISTRY: ${{ matrix.destination.account }}.dkr.ecr.${{ matrix.destination.region }}.amazonaws.com
     steps:
+      - name: Prepare registry credentials directory
+        run: mkdir -p "$DOCKER_CONFIG"
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
         with:
@@ -105,6 +109,14 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           set -euo pipefail
-          docker pull "$SOURCE_IMAGE"
-          docker tag "$SOURCE_IMAGE" "$DESTINATION_REGISTRY/kratos:$IMAGE_TAG"
-          docker push "$DESTINATION_REGISTRY/kratos:$IMAGE_TAG"
+          docker run --rm \
+            --entrypoint skopeo \
+            --volume "$DOCKER_CONFIG:/auth:ro" \
+            quay.io/skopeo/stable:v1 \
+            copy \
+            --src-authfile /auth/config.json \
+            --dest-authfile /auth/config.json \
+            --src-tls-verify=true \
+            --dest-tls-verify=true \
+            "docker://$SOURCE_IMAGE" \
+            "docker://$DESTINATION_REGISTRY/kratos:$IMAGE_TAG"

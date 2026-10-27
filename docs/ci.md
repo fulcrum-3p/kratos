@@ -6,7 +6,7 @@ GitHub Actions replaces the Tekton Pipelines-as-Code configuration:
   `fulcrum_main`. It does not publish an image.
 - `publish-container-images.yml` builds and pushes an image tagged with the
   commit SHA on each push to `fulcrum_main`, then copies it to the regional ECR
-  registries.
+  registries with Skopeo.
 
 The published image is built from `.docker/Dockerfile-build`, matching the
 Tekton Skaffold `kaniko` profile. The copy job runs once per destination:
